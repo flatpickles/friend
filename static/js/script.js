@@ -21,7 +21,7 @@ function getState() {
 function addMessage(message, friend = true) {
     const chatbox = document.getElementById('chatbox');
     const sender = friend ? "Friend" : "You";
-    chatbox.innerHTML += `<div><b>${sender}:</b> ${message}</div>`;
+    chatbox.innerHTML += `<div class="${friend ? 'friend' : 'user'} message"><span class="sender">${sender}:</span> ${message}</div>`;
     chatbox.scrollTop = chatbox.scrollHeight; // Scroll to bottom
     localStorage.setItem('messages', chatbox.innerHTML);
 }
@@ -39,7 +39,9 @@ document.addEventListener('DOMContentLoaded', onLoad);
 
 // FUNCTIONS CALLED FROM UI
 
-function sendMessage() {
+function sendMessage(event) {
+    event.preventDefault();
+
     const { number } = getState();
     const userInput = document.getElementById('userInput').value;
     const chatbox = document.getElementById('chatbox');

@@ -3,17 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sms_friend</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😎</text></svg>">
+    <title>Virtual Friend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 <body>
-    <h1>sms_friend</h1>
-    <p>
-        <a href="https://github.com/flatpickles/sms_friend">sms_friend</a> will soon be available via SMS, but in the meantime you can try it out using this basic web UI. It will save your state, but you can <a href="#" onclick="resetState()">reset it</a>.
-    </p>
-    <div id="chatbox"></div>
-    <input type="text" id="userInput" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
+    <div id="container">
+        <div id="header">
+            <h1>Virtual Friend</h1>
+            <p>
+                This <a href="https://github.com/flatpickles/sms_friend">friend</a> will soon be available via SMS, and in the meantime you can chat from this basic web UI. Chat history is saved, but you can <a href="#" onclick="resetState()">reset it</a>.
+            </p>
+        </div>
+        <div id="chat-ui">
+            <div id="chatbox"></div>
+            <form id="input-form" onsubmit="sendMessage(event)">
+                <input type="text" id="userInput" placeholder="Type a message...">
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
