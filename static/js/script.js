@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', onLoad);
 // FUNCTIONS CALLED FROM UI
 
 function sendMessage() {
+    const { number } = getState();
     const userInput = document.getElementById('userInput').value;
     const chatbox = document.getElementById('chatbox');
 
@@ -55,7 +56,7 @@ function sendMessage() {
     fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userInput })
+        body: JSON.stringify({ message: userInput, number })
     })
     .then(response => response.json())
     .then(data => {
