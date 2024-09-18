@@ -3,6 +3,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 from db import db
 from db.models import Message
+from friend import get_response
 
 sms_bp = Blueprint("sms", __name__)
 
@@ -21,7 +22,7 @@ def sms_reply():
     db.session.commit()
 
     # Create and save a response message
-    reply_txt = f"Hello {from_number}, this is a test response."
+    reply_txt = get_response(from_number)
     message_to_user = Message(
         user_number=from_number,
         message=reply_txt,
