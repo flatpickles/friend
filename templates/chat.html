@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sms_friend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <h1>sms_friend</h1>
+    <p>
+        <a href="https://github.com/flatpickles/sms_friend">sms_friend</a> will soon be available via SMS, but in the meantime you can try it out using this basic web UI. It will save your state, but you can <a href="#" onclick="resetState()">reset it</a>.
+    </p>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+</body>
+</html>
