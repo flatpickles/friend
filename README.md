@@ -1,8 +1,8 @@
-# sms_friend
+# `friend`
 
-This repository contains a friend you can talk to over SMS. It's a Flask app, using the SQLAlchemy ORM, gpt-4o for intelligence, and Twilio for texting.
+This repository contains a friend you can talk to. It's a Flask app, using the SQLAlchemy ORM, and gpt-4o for intelligence.
 
-At the present moment, it's not yet deployed. In many ways, `sms_friend` is a work in progress!
+`friend` will eventually be available over SMS (via Twilio), but it's taking time to get [A2P 10DLC](https://help.twilio.com/articles/1260800720410) compliance sorted. In the meantime, `friend` offers a [simple web interface](https://friend.flatpickles.com) for conversation.
 
 ## Ideas:
 
