@@ -8,7 +8,7 @@ from openai import OpenAI
 
 from config import Config
 from db import db
-from db.models import Message
+from db.models import Detail, Message, User
 
 
 @dataclass
@@ -29,6 +29,12 @@ with open(system_prompt_path, 'r') as file:
     SYSTEM_PROMPT = file.read()
 
 def handle_message(incoming_msg, from_number):
+    # Retrieve or create the user
+    user = User.query.get(from_number)
+    if not user:
+        user = User(user_number=from_number)
+        db.session.add(user)
+
     # Save the message to the db
     message_from_user = Message(
         user_number=from_number,
@@ -36,26 +42,42 @@ def handle_message(incoming_msg, from_number):
         from_user=True
     )
     db.session.add(message_from_user)
-    db.session.commit()
 
-    # Create, save, and return a response message
-    reply_txt = get_response(from_number).response_message
+    # Get the response from the AI
+    response = get_response(user)
+
+    # Save the name if it exists in the response
+    if response.user_name:
+        user.name = response.user_name
+
+    # Save the memorable details if they exist in the response
+    if response.memorable_details:
+        for detail in response.memorable_details:
+            detail_obj = Detail(
+                user_number=from_number,
+                detail=detail
+            )
+            db.session.add(detail_obj)
+
+    # Save the response to the db
     message_to_user = Message(
         user_number=from_number,
-        message=reply_txt,
+        message=response.response_message,
         from_user=False
     )
     db.session.add(message_to_user)
-    db.session.commit()
-    return reply_txt
 
-def get_response(user_number) -> Response:
+    # Commit the changes to the db and return the response message
+    db.session.commit()
+    return response.response_message
+
+def get_response(user: User) -> Response:
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},  # Use the pre-loaded system prompt
     ]
 
     # Retrieve the conversation history from the database
-    conversation_history = Message.query.filter_by(user_number=user_number).order_by(Message.timestamp).all()
+    conversation_history: list[Message] = user.messages
 
     # Add conversation history to the messages list
     for message in conversation_history:

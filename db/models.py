@@ -5,7 +5,7 @@ from db import db
 
 class User(db.Model):
     user_number = db.Column(db.String(15), primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=True)
     messages = db.relationship('Message', backref='user', lazy=True)
     details = db.relationship('Detail', backref='user', lazy=True)
 
