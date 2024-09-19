@@ -6,8 +6,6 @@ This repository contains a friend you can talk to. It's a Flask app, using the S
 
 ## Ideas:
 
-- more personality: we want our friends to be quite interesting!
-- name awareness: a friend would ask about your name and remember it
 - shared context memory: a friend knows things about all its conversations at any given moment
 - 0-N text responses: our friends might not text us back, or might respond with a couple messages
 - delayed text responses: a friend will generally only respond immediately for urgent texts

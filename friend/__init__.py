@@ -22,11 +22,14 @@ client = OpenAI(
     api_key=Config.OPENAI_API_KEY,
 )
 
-# Read system prompt template once at startup
+# Read prompt templates once at startup
 base_dir = os.path.dirname(__file__)
 system_prompt_path = os.path.join(base_dir, 'system.txt')
-with open(system_prompt_path, 'r') as file:
-    SYSTEM_PROMPT = file.read()
+info_prompt_path = os.path.join(base_dir, 'info.txt')
+with open(system_prompt_path, 'r') as system_prompt_file:
+    SYSTEM_PROMPT = system_prompt_file.read()
+with open(info_prompt_path, 'r') as info_prompt_file:
+    INFO_PROMPT = info_prompt_file.read()
 
 def handle_message(incoming_msg, from_number):
     # Retrieve or create the user
@@ -72,8 +75,18 @@ def handle_message(incoming_msg, from_number):
     return response.response_message
 
 def get_response(user: User) -> Response:
+    # Create the system prompt using what we already know about the user
+    additional_info = ""
+    if user.name or (user.details and len(user.details) > 0):
+        additional_info = INFO_PROMPT.format(
+            user_name=(f" (named {user.name})" if user.name else ""),
+            details=", ".join(detail.detail for detail in user.details)
+        )
+    system_prompt = SYSTEM_PROMPT.format(additional_info=additional_info)
+
+    # Create the messages list
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},  # Use the pre-loaded system prompt
+        {"role": "system", "content": system_prompt},
     ]
 
     # Retrieve the conversation history from the database
@@ -125,7 +138,7 @@ def get_failure_message():
     failure_messages = [
         "whoops something went wrong, maybe try again?",
         "wait sorry what's going on?",
-        "uh oh, my brain's a bit fuzzy. mind repeating that?",
+        "uh oh, i'm a bit fuzzy. mind repeating that?",
         "oops, i think i missed something. can you say that again?",
         "hmm, i'm drawing a blank here. one more time?",
         "oh dang i totally spaced out. one more time?",
