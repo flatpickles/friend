@@ -1,10 +1,21 @@
+import json
 import os
+import random
+import re
+from dataclasses import dataclass
 
 from openai import OpenAI
 
 from config import Config
 from db import db
 from db.models import Message
+
+
+@dataclass
+class Response:
+    response_message: str
+    user_name: str | None
+    memorable_details: list[str]
 
 # Create OpenAI client
 client = OpenAI(
@@ -28,7 +39,7 @@ def handle_message(incoming_msg, from_number):
     db.session.commit()
 
     # Create, save, and return a response message
-    reply_txt = get_response(from_number)
+    reply_txt = get_response(from_number).response_message
     message_to_user = Message(
         user_number=from_number,
         message=reply_txt,
@@ -38,7 +49,7 @@ def handle_message(incoming_msg, from_number):
     db.session.commit()
     return reply_txt
 
-def get_response(user_number):
+def get_response(user_number) -> Response:
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},  # Use the pre-loaded system prompt
     ]
@@ -62,6 +73,42 @@ def get_response(user_number):
     )
 
     # Extract the response text from the OpenAI response
-    response_text = response.choices[0].message.content
+    response_text: str = response.choices[0].message.content
 
-    return response_text
+    # Default values
+    response_message = response_text
+    user_name = None
+    memorable_details = []
+
+    # Extract JSON from response text (if it exists)
+    try:
+        match = re.search(r'{.*}', response_text, re.DOTALL)
+        if match:
+            response_json = match.group(0)
+            response_data = json.loads(response_json)
+            user_name = response_data.get("user_name")
+            memorable_details = response_data.get("memorable_details", [])
+            response_message = response_data.get("response_message", "")
+    except json.JSONDecodeError:
+        response_message = get_failure_message()
+
+    # Create and return a Response object
+    return Response(
+        response_message=response_message,
+        user_name=user_name,
+        memorable_details=memorable_details
+    )
+
+def get_failure_message():
+    failure_messages = [
+        "whoops something went wrong, maybe try again?",
+        "wait sorry what's going on?",
+        "uh oh, my brain's a bit fuzzy. mind repeating that?",
+        "oops, i think i missed something. can you say that again?",
+        "hmm, i'm drawing a blank here. one more time?",
+        "oh dang i totally spaced out. one more time?",
+        "yikes, i'm having a moment. could you run that by me again?",
+        "oh no, i think i short-circuited. can you repeat?",
+        "dang, i'm not firing on all cylinders. wassup?",
+    ]
+    return random.choice(failure_messages)
