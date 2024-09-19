@@ -10,7 +10,10 @@ from config import Config
 from db import db
 from db.models import Detail, Message, User
 
+# How many messages we keep in short-term memory (i.e. in the context window)
+SHORT_TERM_MEMORY_LENGTH = 20
 
+# A class to model structured responses from the AI
 @dataclass
 class Response:
     response_message: str
@@ -89,8 +92,14 @@ def get_response(user: User) -> Response:
         {"role": "system", "content": system_prompt},
     ]
 
-    # Retrieve the conversation history from the database
-    conversation_history: list[Message] = user.messages
+    # Retrieve the most recent messages from the conversation history using a dedicated query
+    conversation_history: list[Message] = (
+        db.session.query(Message)
+        .filter_by(user_number=user.user_number)
+        .order_by(Message.id.desc()) # use ID instead of timestamp for accurate insertion order
+        .limit(SHORT_TERM_MEMORY_LENGTH)
+        .all()[::-1]
+    )
 
     # Add conversation history to the messages list
     for message in conversation_history:
