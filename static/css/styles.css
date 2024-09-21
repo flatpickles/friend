@@ -25,6 +25,17 @@ body {
   flex-direction: column;
   gap: 0.25rem;
   line-height: 1.25;
+  text-align: center;
+}
+
+#title {
+  font-size: 3rem;
+}
+
+#subtitle {
+  font-size: 1rem;
+  /* font-style: italic; */
+  color: #666;
 }
 
 #chat-ui {

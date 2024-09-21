@@ -6,6 +6,7 @@ This repository contains a friend you can talk to. It's a Flask app, using the S
 
 ## Ideas:
 
-- shared context memory: a friend knows things about all its conversations at any given moment
+- shared memory between different chats: a friend knows things about all its conversations at any given moment
 - 0-N text responses: our friends might not text us back, or might respond with a couple messages
-- delayed text responses: a friend will generally only respond immediately for urgent texts
+- delayed text responses: a friend will generally only respond immediately for urgent texts (SMS friend only, not live/web chat)
+- incorporate time since last message (don't readily reference old messages)
