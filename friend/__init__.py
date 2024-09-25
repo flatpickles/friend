@@ -28,11 +28,16 @@ client = OpenAI(
 # Read prompt templates once at startup
 base_dir = os.path.dirname(__file__)
 system_prompt_path = os.path.join(base_dir, 'system.txt')
-info_prompt_path = os.path.join(base_dir, 'info.txt')
+details_prompt_path = os.path.join(base_dir, 'details.json')
 with open(system_prompt_path, 'r') as system_prompt_file:
     SYSTEM_PROMPT = system_prompt_file.read()
-with open(info_prompt_path, 'r') as info_prompt_file:
-    INFO_PROMPT = info_prompt_file.read()
+with open(details_prompt_path, 'r') as json_file:
+    DETAIL_PROMPT_FRAGMENTS = json.load(json_file)
+
+def inject_detail(prompt_fragment: str, data: dict) -> str:
+    for key, value in data.items():
+        prompt_fragment = prompt_fragment.replace(f"<{key}>", value)
+    return prompt_fragment
 
 def handle_message(incoming_msg, from_number):
     # Retrieve or create the user
@@ -78,14 +83,15 @@ def handle_message(incoming_msg, from_number):
     return response.response_message
 
 def get_response(user: User) -> Response:
-    # Create the system prompt using what we already know about the user
-    additional_info = ""
-    if user.name or (user.details and len(user.details) > 0):
-        additional_info = INFO_PROMPT.format(
-            user_name=(f" (named {user.name})" if user.name else ""),
-            details=", ".join(detail.detail for detail in user.details)
-        )
-    system_prompt = SYSTEM_PROMPT.format(additional_info=additional_info)
+    # Create contextual details to add ot the system prompt
+    details = ""
+    if user.name:
+        details += inject_detail(DETAIL_PROMPT_FRAGMENTS["user_name"], {"user_name": user.name})
+    if user.details and len(user.details) > 0:
+        more_details = "* " + "\n* ".join(detail.detail for detail in user.details)
+        details += inject_detail(DETAIL_PROMPT_FRAGMENTS["more_details"], {"details": more_details})
+    # todo: other details
+    system_prompt = SYSTEM_PROMPT.format(details=details)
 
     # Create the messages list
     messages = [

@@ -1,0 +1,6 @@
+{
+  "time": "The time of day is <time>. ",
+  "weather": "The weather where you're located is <weather>. ",
+  "user_name": "The name of your friend is is <user_name>. ",
+  "more_details": "You also know the following details about your friend: \n<details>"
+}
